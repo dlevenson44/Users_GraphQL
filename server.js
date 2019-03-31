@@ -1,6 +1,7 @@
 const express = require('express');
 // important to properly case GraphQL as such, graphql or Graphql or any other variation can cause errors referencing the libraries
 const expressGraphQL = require('express-graphql');
+const schema = require('./schema/schema');
 
 // create new app
 const app = express();
@@ -9,6 +10,7 @@ const app = express();
 app.use('/graphql', expressGraphQL({
   // setting this to true lets us make queries in Dev server
   // only intended to only be used in a Dev environment
+  schema,
   graphiql: true,
 }))
 
