@@ -1,7 +1,7 @@
 //  tells application what the data looks like
 //  what properties each object has and how the objects relate to each other
 const graphql = require('graphql');
-const _ = require('lodash');
+const axios = require('axios');
 
 const {
   GraphQLObjectType,
@@ -10,10 +10,6 @@ const {
   GraphQLSchema,
 } = graphql;
 
-const users = [
-  { id: '23', firstName: 'Dan', age: 28 },
-  { id: '47', firstName: 'Gurk', age: 52 },
-];
 
 //  this object tells GraphQL what properties a User object should have
 //  GraphQLObjectType takes in two arguments of name and fields
@@ -38,10 +34,13 @@ const RootQuery = new GraphQLObjectType({
       // resolve function searches for user with provided ID
       // parentValue
       // args is an object that gets called with any args that were passed to the query, in this case the ID 
+      // GraphQL waits for a response from this
       resolve(parentValue, args) {
-        //  use lodash find function
-        //  find the object within the users array with the id being searched for
-        return _.find(users, { id: args.id });
+        // get the ID for the specific user from JSON server
+        return axios.get(`http://localhost:3000/users/${args.id}`)
+          // Axios adds layer of "data" when making HTTP requests
+          // Below line lets us skip that in the response
+          .then(res => res.data);
       }
     }
   }
