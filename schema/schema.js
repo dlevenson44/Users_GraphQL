@@ -10,6 +10,16 @@ const {
   GraphQLSchema,
 } = graphql;
 
+// Import to define company before user since we reference it as a relation in the UserType
+const CompanyType = new GraphQLObjectType({
+  name: 'Company',
+  fields: {
+    id: { type: GraphQLString },
+    name: { type: GraphQLString },
+    description: { type: GraphQLString },
+  },
+})
+
 
 //  this object tells GraphQL what properties a User object should have
 //  GraphQLObjectType takes in two arguments of name and fields
@@ -20,7 +30,10 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLString },
     firstName: { type: GraphQLString },
     age: { type: GraphQLInt },
-  }
+    company: {
+      type: CompanyType
+    }
+  },
 });
 
 //  RootQuery lets GraphQL jump and land on a specific node in our data
@@ -42,7 +55,7 @@ const RootQuery = new GraphQLObjectType({
           // Below line lets us skip that in the response
           .then(res => res.data);
       }
-    }
+    },
   }
 })
 

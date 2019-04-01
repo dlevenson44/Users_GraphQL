@@ -1,6 +1,11 @@
 {
   "users": [
-    { "id": "23", "firstName": "Dan", "age": 28 },
-    { "id": "40", "firstName": "Dan 2", "age": 29 }
+    { "id": "23", "firstName": "Dan", "age": 28, "companyId": "1" },
+    { "id": "64", "firstName": "Dan2", "age": 29, "companyId": "2" },
+    { "id": "40", "firstName": "Dan3", "age": 30, "companyId": "2" }
+  ],
+  "companies": [
+    { "id": "1", "name": "Apple", "description": "Good stuff"},
+    { "id": "2", "name": "Sony", "description": "PS4 has some decent games" }
   ]
 }
