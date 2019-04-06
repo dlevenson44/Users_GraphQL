@@ -31,7 +31,16 @@ const UserType = new GraphQLObjectType({
     firstName: { type: GraphQLString },
     age: { type: GraphQLInt },
     company: {
-      type: CompanyType
+      type: CompanyType,
+      // resolve function resolves differences between incoming JSON and the actual datatype we're trying to use
+      // need to return company from a given user
+      // parentValue represents the user we just fetched
+      // so parentValue.company would return the company information
+      resolve(parentValue, args) {
+        console.log('parentValue:', parentValue)
+        return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`) 
+          .then(res => res.data)
+      }
     }
   },
 });
@@ -45,7 +54,6 @@ const RootQuery = new GraphQLObjectType({
       type: UserType,
       args: { id: { type: GraphQLString } },
       // resolve function searches for user with provided ID
-      // parentValue
       // args is an object that gets called with any args that were passed to the query, in this case the ID 
       // GraphQL waits for a response from this
       resolve(parentValue, args) {
