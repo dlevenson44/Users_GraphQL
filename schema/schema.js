@@ -7,6 +7,7 @@ const {
   GraphQLInt,
   GraphQLString,
   GraphQLSchema,
+  GraphQLList
 } = graphql;
 
 // Import to define company before user since we reference it as a relation in the UserType
