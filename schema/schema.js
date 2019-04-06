@@ -2,7 +2,6 @@
 //  what properties each object has and how the objects relate to each other
 const graphql = require('graphql');
 const axios = require('axios');
-
 const {
   GraphQLObjectType,
   GraphQLInt,
@@ -13,20 +12,29 @@ const {
 // Import to define company before user since we reference it as a relation in the UserType
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
-  fields: {
+  fields: () => ({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
-  },
-})
-
+    users: {
+      // setting the type to UserType creates an issue of circular references
+      // we need user type before it is defined, or we would need company type before it's defined if we switched function order
+      // wrap it in an arrow function so that the code doesn't get executed until after the full file has loaded
+      type: new GraphQLList(UserType),
+      resolve(parentValue, args) {
+        return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`)
+          .then(res => res.data)
+      }
+    }
+  })
+});
 
 //  this object tells GraphQL what properties a User object should have
 //  GraphQLObjectType takes in two arguments of name and fields
 //  name is the type of object's name, and the fields are the properties
 const UserType = new GraphQLObjectType({
   name: 'User',
-  fields: {
+  fields: () => ({
     id: { type: GraphQLString },
     firstName: { type: GraphQLString },
     age: { type: GraphQLInt },
@@ -37,12 +45,11 @@ const UserType = new GraphQLObjectType({
       // parentValue represents the user we just fetched
       // so parentValue.company would return the company information
       resolve(parentValue, args) {
-        console.log('parentValue:', parentValue)
-        return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`) 
+        return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`)
           .then(res => res.data);
       }
     }
-  },
+  })
 });
 
 //  RootQuery lets GraphQL jump and land on a specific node in our data
@@ -73,7 +80,7 @@ const RootQuery = new GraphQLObjectType({
       }
     }
   }
-})
+});
 
 //  Take User and Root type, merge them together into GraphQL schema, then hand that back to the middleware
 module.exports = new GraphQLSchema({
