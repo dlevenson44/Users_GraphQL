@@ -7,7 +7,8 @@ const {
   GraphQLInt,
   GraphQLString,
   GraphQLSchema,
-  GraphQLList
+  GraphQLList,
+  GraphQLNonNull,
 } = graphql;
 
 // Import to define company before user since we reference it as a relation in the UserType
@@ -83,8 +84,30 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addUser: {
+      // type of data we will retrun in resolve function
+      type: UserType,
+      args: {
+        // GraphQLNonNull means field is required with proper data type
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: new GraphQLNonNull(GraphQLInt) },
+        companyId: { type: GraphQLString },
+      },
+      // resolve is where we actually create new data
+      resolve(parentValue, { firstName, age }) {
+        return axios.post('http://localhost:3000/users', { firstName, age })
+          .then(res => res.data);
+      }
+    }
+  }
+})
+
 //  Take User and Root type, merge them together into GraphQL schema, then hand that back to the middleware
 module.exports = new GraphQLSchema({
   query: RootQuery,
+  mutation,
 });
 
